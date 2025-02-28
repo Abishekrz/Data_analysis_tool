@@ -1,0 +1,23 @@
+.visualization-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.visualization-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+}
