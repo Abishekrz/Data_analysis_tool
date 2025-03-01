@@ -1,8 +1,7 @@
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 import os
-import traceback  # Import for debugging
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -10,11 +9,25 @@ CORS(app)  # Enable CORS for all routes
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+def preprocess_data(df):
+    """Applies basic preprocessing (drop null values, normalize numeric columns)."""
+    
+    df_cleaned = df.dropna()
+
+    # Normalize numeric columns
+    numeric_cols = df_cleaned.select_dtypes(include=["number"]).columns
+    if not numeric_cols.empty:
+        df_cleaned[numeric_cols] = (df_cleaned[numeric_cols] - df_cleaned[numeric_cols].min()) / (
+            df_cleaned[numeric_cols].max() - df_cleaned[numeric_cols].min()
+        )
+
+    return df_cleaned
+
 @app.route("/upload", methods=["POST"])
 def upload_file():
     try:
         if "file" not in request.files:
-            return jsonify({"error": "No file part"}), 400
+            return jsonify({"error": "No file uploaded"}), 400
 
         file = request.files["file"]
 
@@ -27,22 +40,16 @@ def upload_file():
 
             # Read CSV and apply preprocessing
             df = pd.read_csv(filepath)
+            df_cleaned = preprocess_data(df)
 
-            # Example preprocessing: Remove null values
-            df_cleaned = df.dropna()
+            # Convert processed data to JSON and return
+            return jsonify(df_cleaned.to_dict(orient="records"))
 
-            # Save processed data to Excel
-            output_filepath = os.path.join(UPLOAD_FOLDER, "processed_data.xlsx")
-            df_cleaned.to_excel(output_filepath, index=False)
-
-            return send_file(output_filepath, as_attachment=True)
-
-        return jsonify({"error": "Invalid file type. Only CSV is allowed."}), 400
+        return jsonify({"error": "Invalid file format. Please upload a CSV file."}), 400
 
     except Exception as e:
-        print("🔥 Backend Error:", str(e))
-        print(traceback.format_exc())  # Print full error traceback
-        return jsonify({"error": "Internal Server Error"}), 500  # Send error response
+        print("Error:", str(e))
+        return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

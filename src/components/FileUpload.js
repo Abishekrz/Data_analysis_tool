@@ -5,6 +5,8 @@ import "./FileUpload.css";
 const FileUpload = () => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [processedData, setProcessedData] = useState([]);
+    const [error, setError] = useState("");
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
@@ -22,26 +24,22 @@ const FileUpload = () => {
         }
 
         setLoading(true);
+        setError("");
+
         const formData = new FormData();
         formData.append("file", file);
 
         try {
-            const response = await axios.post("http://localhost:5000/upload", formData, {
-                responseType: "blob",
-            });
+            const response = await axios.post("http://localhost:5000/upload", formData);
 
-            // Create a URL for downloading the processed Excel file
-            const blob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "processed_data.xlsx";
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
+            if (response.data.error) {
+                setError(response.data.error);
+            } else {
+                setProcessedData(response.data);
+            }
         } catch (error) {
             console.error("Error uploading file:", error);
-            alert("Failed to process the file.");
+            setError("Failed to process the file.");
         } finally {
             setLoading(false);
         }
@@ -54,6 +52,33 @@ const FileUpload = () => {
             <button onClick={handleUpload} disabled={loading}>
                 {loading ? "Processing..." : "Upload and Process"}
             </button>
+
+            {error && <p className="error-message">{error}</p>}
+
+            {/* Display Processed Data in a Table */}
+            {processedData.length > 0 && (
+                <div className="table-container">
+                    <h3>Processed Data</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                {Object.keys(processedData[0]).map((key) => (
+                                    <th key={key}>{key}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {processedData.map((row, index) => (
+                                <tr key={index}>
+                                    {Object.values(row).map((value, idx) => (
+                                        <td key={idx}>{value}</td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };
