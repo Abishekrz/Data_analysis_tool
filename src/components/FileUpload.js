@@ -1,86 +1,64 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./FileUpload.css";
 
-const FileUpload = () => {
+const PreprocessingDashboard = () => {
     const [file, setFile] = useState(null);
+    const [processedData, setProcessedData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [processedData, setProcessedData] = useState([]);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(null);
 
     const handleFileChange = (event) => {
-        const selectedFile = event.target.files[0];
-        if (selectedFile && selectedFile.type === "text/csv") {
-            setFile(selectedFile);
-        } else {
-            alert("Please upload a valid CSV file.");
-        }
+        setFile(event.target.files[0]);
     };
 
     const handleUpload = async () => {
         if (!file) {
-            alert("Please select a CSV file first.");
+            setError("Please select a file first.");
             return;
         }
-
+        
         setLoading(true);
-        setError("");
-
+        setError(null);
         const formData = new FormData();
         formData.append("file", file);
 
         try {
-            const response = await axios.post("http://localhost:5000/upload", formData);
-
-            if (response.data.error) {
-                setError(response.data.error);
-            } else {
-                setProcessedData(response.data);
-            }
-        } catch (error) {
-            console.error("Error uploading file:", error);
-            setError("Failed to process the file.");
+            const response = await axios.post("http://localhost:5000/upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            
+            setProcessedData(response.data);
+        } catch (err) {
+            setError(err.response?.data?.error || "An error occurred while processing the file.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="file-upload-container">
-            <h2>Upload CSV File</h2>
+        <div style={{ padding: "20px" }}>
+            <h2>Data Preprocessing Dashboard</h2>
             <input type="file" accept=".csv" onChange={handleFileChange} />
             <button onClick={handleUpload} disabled={loading}>
                 {loading ? "Processing..." : "Upload and Process"}
             </button>
-
-            {error && <p className="error-message">{error}</p>}
-
-            {/* Display Processed Data in a Table */}
-            {processedData.length > 0 && (
-                <div className="table-container">
-                    <h3>Processed Data</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                {Object.keys(processedData[0]).map((key) => (
-                                    <th key={key}>{key}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {processedData.map((row, index) => (
-                                <tr key={index}>
-                                    {Object.values(row).map((value, idx) => (
-                                        <td key={idx}>{value}</td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            
+            {processedData && (
+                <div>
+                    <h3>Processed Data Preview</h3>
+                    <pre>{JSON.stringify(processedData.processed_data.slice(0, 5), null, 2)}</pre>
+                    <a href={processedData.download_link} download>
+                        <button>Download Processed CSV</button>
+                    </a>
+                    <a href={processedData.visualization_link} target="_blank" rel="noopener noreferrer">
+                        <button>View Histogram</button>
+                    </a>
                 </div>
             )}
         </div>
     );
 };
 
-export default FileUpload;
+export default PreprocessingDashboard;
