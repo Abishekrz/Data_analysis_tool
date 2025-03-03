@@ -1,59 +1,78 @@
-.file-upload-container {
+/* General Styles */
+.container {
+    max-width: 500px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
     text-align: center;
-    margin: 20px;
-}
-
-input {
-    margin: 10px 0;
-}
-
-button {
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
+  }
+  
+  /* Heading */
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* File Input */
+  input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Buttons */
+  button {
+    width: 100%;
+    padding: 10px;
     border: none;
     border-radius: 5px;
-    margin: 10px;
-}
-
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.download-btn {
-    background-color: #28a745;
-}
-
-.table-container {
-    margin-top: 20px;
-    overflow-x: auto;
-}
-
-table {
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  /* Primary Button */
+  .upload-btn {
+    background: #007bff;
+    color: white;
+  }
+  
+  .process-btn {
+    background: #28a745;
+    color: white;
+  }
+  
+  /* Dropdown */
+  select {
     width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f4f4f4;
-}
-
-.visualization-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+  }
+  
+  /* Error Messages */
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  /* Table Display */
+  .data-table {
+    background: #f8f9fa;
+    padding: 10px;
     margin-top: 20px;
-}
-
-.visualization-container img {
-    width: 80%;
-    max-width: 600px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-}
+    border-radius: 5px;
+    overflow-x: auto;
+  }
+  
