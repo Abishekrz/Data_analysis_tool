@@ -1,92 +1,139 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./FileUpload.css";  // Import CSS file
+import "./FileUpload.css";
 
-const FileUpload = () => {
-  const [file, setFile] = useState(null);
+export default function PreprocessingDashboard() {
+  const [selectedFile, setSelectedFile] = useState(null);
   const [filename, setFilename] = useState("");
-  const [operation, setOperation] = useState("sampling");
-  const [tableHtml, setTableHtml] = useState("");
+  const [operation, setOperation] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [tableData, setTableData] = useState("");
+  const [image, setImage] = useState("");
 
+  // Handle File Selection
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file && file.name.endsWith(".csv")) {
+      setSelectedFile(file);
+      setError("");
+    } else {
+      setError("Only CSV files are allowed!");
+      setSelectedFile(null);
+    }
   };
 
+  // Upload File
   const handleUpload = async () => {
-    if (!file) {
-      setError("Please select a file to upload.");
+    if (!selectedFile) {
+      setError("Please select a CSV file first.");
       return;
     }
 
+    setLoading(true);
+    setError("");
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", selectedFile);
 
     try {
       const response = await axios.post("http://127.0.0.1:5000/upload", formData);
       setFilename(response.data.filename);
-      setError(""); // Clear errors
-      alert("File uploaded successfully!");
+      setLoading(false);
     } catch (err) {
-      console.error("Upload Error:", err);
-      setError("Failed to upload file.");
+      setError("Upload failed. Please try again.");
+      setLoading(false);
     }
   };
 
+  // Process Data
   const handleProcess = async () => {
-    if (!filename) {
-      setError("Please upload a file first.");
+    if (!filename || !operation) {
+      setError("Select a processing operation first.");
       return;
     }
 
-    try {
-      const response = await axios.post("http://127.0.0.1:5000/process", {
-        filename: filename,
-        operation: operation,
-      });
+    setLoading(true);
+    setError("");
 
-      if (response.data.status === "success") {
-        setTableHtml(response.data.table);
-        setError(""); // Clear errors
-      } else {
-        setError(response.data.error || "Processing failed.");
-      }
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/process", { filename, operation });
+      setTableData(response.data.table);
+      setLoading(false);
     } catch (err) {
-      console.error("Processing Error:", err);
-      setError("Error processing file. File might be incompatible.");
+      setError("Processing failed. Please check your file and operation.");
+      setLoading(false);
+    }
+  };
+
+  // Visualize Data
+  const handleVisualize = async () => {
+    if (!filename || !operation) {
+      setError("Select an operation for visualization.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/visualize", { filename, operation });
+      if (response.data.status === "success") {
+        setImage(`data:image/png;base64,${response.data.image}`);
+      } else {
+        setError("Visualization failed. Try a different operation.");
+      }
+      setLoading(false);
+    } catch (err) {
+      setError("Visualization error. Check the console for details.");
+      setLoading(false);
     }
   };
 
   return (
     <div className="container">
-      <h2>Upload & Process Data</h2>
+      {/* <h2>Data Preprocessing Dashboard</h2> */}
 
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload} className="upload-btn">Upload</button>
+      {/* File Upload */}
+      <div className="file-upload">
+        <input type="file" accept=".csv" onChange={handleFileChange} />
+        <button onClick={handleUpload} disabled={loading}>Upload CSV</button>
+      </div>
 
-      <br />
-      <label>Select Operation:</label>
-      <select value={operation} onChange={(e) => setOperation(e.target.value)}>
-        <option value="sampling">Sampling</option>
-        <option value="normalization">Normalization</option>
-        <option value="pca">PCA</option>
-        <option value="clustering">Clustering</option>
-        <option value="market_analysis">Market Analysis</option>
-      </select>
+      {/* Operation Selection */}
+      <div className="operations">
+        <label>Select an Operation:</label>
+        <select onChange={(e) => setOperation(e.target.value)} value={operation}>
+          <option value="">--Select--</option>
+          <option value="sampling">Sampling</option>
+          <option value="normalization">Normalization</option>
+          <option value="pca">PCA</option>
+          <option value="clustering">Clustering</option>
+        </select>
+        <button onClick={handleProcess} disabled={loading || !filename}>Process</button>
+        <button onClick={handleVisualize} disabled={loading || !filename}>Visualize</button>
+      </div>
 
-      <button onClick={handleProcess} className="process-btn">Process</button>
-
+      {/* Error Message */}
       {error && <p className="error">{error}</p>}
 
-      {/* Display the processed table */}
-      {tableHtml && (
-        <div
-          dangerouslySetInnerHTML={{ __html: tableHtml }}
-          className="data-table"
-        />
+      {/* Processed Table */}
+      {tableData && (
+        <div className="table-container">
+          <h3>Processed Data</h3>
+          <div dangerouslySetInnerHTML={{ __html: tableData }} />
+        </div>
       )}
+
+      {/* Visualization Output */}
+      {image && (
+        <div className="image-container">
+          <h3>Visualization</h3>
+          <img src={image} alt="Visualization" />
+        </div>
+      )}
+
+      {loading && <p>Loading...</p>}
     </div>
   );
-};
-
-export default FileUpload;
+}

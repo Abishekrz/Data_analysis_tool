@@ -1,78 +1,119 @@
-/* General Styles */
+/* General Styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+}
+
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120vh;  /* Increased height */
+  padding: 40px 0;  /* Added padding for better spacing */
+}
+
+/* Main Container */
 .container {
-    max-width: 500px;
-    margin: 50px auto;
-    background: #fff;
-    padding: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-  /* Heading */
-  h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  /* File Input */
-  input[type="file"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  /* Buttons */
-  button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-  
-  button:hover {
-    opacity: 0.9;
-  }
-  
-  /* Primary Button */
-  .upload-btn {
-    background: #007bff;
-    color: white;
-  }
-  
-  .process-btn {
-    background: #28a745;
-    color: white;
-  }
-  
-  /* Dropdown */
-  select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 15px;
-  }
-  
-  /* Error Messages */
-  .error {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-  
-  /* Table Display */
-  .data-table {
-    background: #f8f9fa;
-    padding: 10px;
-    margin-top: 20px;
-    border-radius: 5px;
-    overflow-x: auto;
-  }
-  
+  width: 80%; /* Increased width */
+  max-width: 1000px; /* Ensuring it doesn’t stretch too much */
+  background: white;
+  padding: 40px; /* Increased padding for better spacing */
+  border-radius: 12px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+/* Heading */
+h2 {
+  font-size: 26px;
+  margin-bottom: 25px;
+  color: #2c3e50;
+}
+
+/* File Upload Section */
+.file-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.file-upload input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Buttons */
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Operation Selection */
+.operations {
+  margin: 25px 0;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.operations select {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+/* Error Message */
+.error {
+  color: red;
+  font-weight: bold;
+  margin: 12px 0;
+  font-size: 16px;
+}
+
+/* Processed Data Table */
+.table-container {
+  margin-top: 25px;
+  overflow-x: auto;
+  max-height: 350px;
+  border-radius: 6px;
+  padding: 15px;
+  background: #ecf0f1;
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.1);
+}
+
+/* Visualization Section */
+.image-container {
+  margin-top: 25px;
+}
+
+.image-container img {
+  width: 100%;
+  max-width: 600px; /* Increased max width */
+  border-radius: 6px;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 12px;
+}
